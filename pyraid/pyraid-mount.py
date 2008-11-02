@@ -32,7 +32,7 @@ class BlankStat(fuse.Stat):
 class RaidFS(Fuse):
     def __init__(self, raid_options, raid_volumes, *args, **kwargs):
         Fuse.__init__(self, *args, **kwargs)
-        self.raid_dev = pyraid.RaidDevice(volumes=raid_volumes, level=int(raid_options.level), stripe_size=int(raid_options.stripe_size), offset=int(raid_options.offset))
+        self.raid_dev = pyraid.RaidDevice(volumes=raid_volumes, level=int(raid_options.level), stripe_size=int(raid_options.stripe_size), disk_size=int(raid_options.disk_size), offset=int(raid_options.offset))
         #self.size = self.raid_dev.size()
     def getattr(self, path):
         st = BlankStat()
@@ -76,6 +76,7 @@ def main():
     parser.set_usage('python pyraid-mount.py [options] volume1, volume2, [volume3,...]')
     parser.add_option('-l', '--level', dest='level', help='RAID level to use (0 or 5)', metavar='LEVEL', default=0)
     parser.add_option('-s', '--stripe-size', dest='stripe_size', help='Stripe size in bytes', metavar='BYTES', default=64*1024)
+    parser.add_option('-d', '--disk-size', dest='disk_size', help='Disk size in bytes', metavar='BYTES', default=0)
     parser.add_option('-o', '--offset', dest='offset', help='Physical offset of first stripe', metavar='BYTES', default=0)
     parser.add_option('-m', '--mount-point', dest='mount_point', help='Path to mount raw device', metavar='PATH', default='.')
     parser.add_option('-r', '--rotation', dest='rotation', help='Parity rotation direction for RAID-5 (left or right)', metavar='DIRECTION', default='left')

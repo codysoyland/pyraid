@@ -1,7 +1,7 @@
 import os
 
 class RaidDevice(object):
-    def __init__(self, volumes, level, stripe_size, offset, rotation='left', algorithm='asynchronous'):
+    def __init__(self, volumes, level, stripe_size, disk_size=0, offset=0, rotation='left', algorithm='asynchronous'):
         if level not in (0, 5):
             raise Exception('Raid level must be 0 or 5')
         self.level = level
@@ -15,6 +15,8 @@ class RaidDevice(object):
             raise Exception('Stripe size must be an integer')
         if type(offset) != type(0):
             raise Exception('Offset must be an integer')
+        if type(disk_size) != type(0):
+            raise Exception('Disk size must be an integer')
         if rotation not in ('left', 'right'):
             raise Exception('Rotation must be left or right')
         if algorithm not in ('asynchronous', 'synchronous'):
@@ -22,6 +24,7 @@ class RaidDevice(object):
         self.volumes = [open(v, 'r') for v in volumes]
         self.volume_names = volumes
         self.stripe_size = stripe_size
+        self.disk_size = disk_size
         self.offset = offset
         self.volume_count = len(self.volumes)
         self.rotation = rotation
@@ -80,10 +83,10 @@ class RaidDevice(object):
         return output
     def size(self):
         if self.level == 0:
-            volume_size = os.path.getsize(self.volume_names[0])
+            volume_size = self.disk_size or os.path.getsize(self.volume_names[0])
             return (volume_size - self.offset) * self.volume_count
         if self.level == 5:
-            volume_size = os.path.getsize(self.volume_names[0])
+            volume_size = self.disk_size or os.path.getsize(self.volume_names[0])
             return (volume_size - self.offset) * (self.volume_count - 1)
     def close(self):
         [file.close() for file in self.volumes]
