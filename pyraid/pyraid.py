@@ -11,11 +11,11 @@ class RaidDevice(object):
         elif self.level == 5:
             if len(volumes) < 3:
                 raise Exception('Raid level 5 requires at least 3 volumes')
-        if type(stripe_size) != type(0): #int
+        if type(stripe_size) not in (int, long):
             raise Exception('Stripe size must be an integer')
-        if type(offset) != type(0):
+        if type(offset) not in (int, long):
             raise Exception('Offset must be an integer')
-        if type(disk_size) != type(0):
+        if type(disk_size) not in (int, long):
             raise Exception('Disk size must be an integer')
         if rotation not in ('left', 'right'):
             raise Exception('Rotation must be left or right')
