@@ -26,7 +26,15 @@ class BlankStat(fuse.Stat):
 class RaidFS(fuse.Fuse):
     def __init__(self, raid_options, raid_volumes, *args, **kwargs):
         fuse.Fuse.__init__(self, *args, **kwargs)
-        self.raid_dev = pyraid.RaidDevice(volumes=raid_volumes, level=int(raid_options.level), stripe_size=int(raid_options.stripe_size), disk_size=int(raid_options.disk_size), offset=int(raid_options.offset))
+        self.raid_dev = pyraid.RaidDevice(
+            volumes = raid_volumes,
+            level = int(raid_options.level),
+            stripe_size = int(raid_options.stripe_size),
+            disk_size = int(raid_options.disk_size),
+            offset = int(raid_options.offset),
+            rotation = raid_options.rotation,
+            algorithm = raid_options.algorithm,
+        )
         #self.size = self.raid_dev.size()
     def getattr(self, path):
         st = BlankStat()
