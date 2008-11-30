@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 import pyraid
 import os, stat, errno
-# pull in some spaghetti to make this stuff work without fuse-py being installed
-try:
-    import _find_fuse_parts
-except ImportError:
-    pass
 import fuse
-from fuse import Fuse
 
 if not hasattr(fuse, '__version__'):
     raise RuntimeError, \
@@ -29,9 +23,9 @@ class BlankStat(fuse.Stat):
         self.st_mtime = 0
         self.st_ctime = 0
 
-class RaidFS(Fuse):
+class RaidFS(fuse.Fuse):
     def __init__(self, raid_options, raid_volumes, *args, **kwargs):
-        Fuse.__init__(self, *args, **kwargs)
+        fuse.Fuse.__init__(self, *args, **kwargs)
         self.raid_dev = pyraid.RaidDevice(volumes=raid_volumes, level=int(raid_options.level), stripe_size=int(raid_options.stripe_size), disk_size=int(raid_options.disk_size), offset=int(raid_options.offset))
         #self.size = self.raid_dev.size()
     def getattr(self, path):
@@ -84,16 +78,9 @@ def main():
     options, args = parser.parse_args() 
 
     import sys
-    sys.argv = [sys.argv[0], options.mount_point, '-d'] # hack to set command line arguments to those that python-fuse will correctly parse
-
-    usage="""
-Usersrpace hello example
-
-""" + Fuse.fusage
-    server = RaidFS(options, args, version="%prog " + fuse.__version__,
-                     usage=usage,
-                     dash_s_do='setsingle')
-
+    sys.argv = [sys.argv[0], options.mount_point, '-f'] # hack to set command line arguments to those that python-fuse will correctly parse
+    
+    server = RaidFS(options, args, version="%prog " + fuse.__version__, dash_s_do='setsingle')
     server.parse(errex=1)
     server.main()
 
