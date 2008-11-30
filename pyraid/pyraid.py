@@ -97,4 +97,5 @@ class RaidDevice(object):
             volume_size = self.disk_size or os.path.getsize(self.volume_names[0])
             return (volume_size - self.offset) * (self.volume_count - 1)
     def close(self):
-        [file.close() for file in self.volumes]
+        for volume in self.volumes:
+            volume.close()
