@@ -81,6 +81,14 @@ class RaidDevice(object):
         for block in self.read_blocks(length, offset):
             output += block
         return output
+    def dump_blocks(self, length, offset=0, dump_block_size=65536):
+        start = offset
+        end = offset + length
+        if length < dump_block_size:
+            yield self.read(length, offset)
+        else:
+            for dump_pos in range(start, end, dump_block_size):
+                yield self.read(dump_block_size, dump_pos)
     def size(self):
         if self.level == 0:
             volume_size = self.disk_size or os.path.getsize(self.volume_names[0])

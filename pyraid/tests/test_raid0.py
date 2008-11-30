@@ -14,6 +14,16 @@ class TwoDiskSS1(unittest.TestCase):
         assert self.raid.size() == 10
     def test_read_all(self):
         assert self.raid.read(10) == '1a2b3c4d5e'
+    def test_dump_all(self):
+        output = ''
+        for chunk in self.raid.dump_blocks(self.raid.size(), dump_block_size=2):
+            output += chunk
+        assert output == '1a2b3c4d5e'
+    def test_dump_part(self):
+        output = ''
+        for chunk in self.raid.dump_blocks(self.raid.size() - 2, offset=2, dump_block_size=2):
+            output += chunk
+        assert output == '2b3c4d5e'
     def test_read_part_1(self):
         assert self.raid.read(5) == '1a2b3'
     def test_read_part_2(self):

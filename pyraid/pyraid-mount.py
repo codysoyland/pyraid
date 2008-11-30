@@ -75,10 +75,10 @@ class RaidFS(fuse.Fuse):
 def main():
     from optparse import OptionParser
     parser = OptionParser()
-    parser.set_usage('python pyraid-mount.py [options] volume1, volume2, [volume3,...]')
+    parser.set_usage('python pyraid-mount.py [options] volume1 volume2 [volume3...]')
     parser.add_option('-l', '--level', dest='level', help='RAID level to use (0 or 5)', metavar='LEVEL', default=0)
     parser.add_option('-s', '--stripe-size', dest='stripe_size', help='Stripe size in bytes', metavar='BYTES', default=64*1024)
-    parser.add_option('-d', '--disk-size', dest='disk_size', help='Disk size in bytes', metavar='BYTES', default=0)
+    parser.add_option('-d', '--disk-size', dest='disk_size', help='Disk size in bytes (optional override)', metavar='BYTES', default=0)
     parser.add_option('-o', '--offset', dest='offset', help='Physical offset of first stripe', metavar='BYTES', default=0)
     parser.add_option('-m', '--mount-point', dest='mount_point', help='Path to mount raw device', metavar='PATH', default='.')
     parser.add_option('-r', '--rotation', dest='rotation', help='Parity rotation direction for RAID-5 (left or right)', metavar='DIRECTION', default='left')
