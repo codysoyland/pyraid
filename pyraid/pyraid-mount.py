@@ -26,16 +26,23 @@ class BlankStat(fuse.Stat):
 class RaidFS(fuse.Fuse):
     def __init__(self, raid_options, raid_volumes, *args, **kwargs):
         fuse.Fuse.__init__(self, *args, **kwargs)
-        self.raid_dev = pyraid.RaidDevice(
-            volumes = raid_volumes,
-            level = int(raid_options.level),
-            stripe_size = int(raid_options.stripe_size),
-            disk_size = int(raid_options.disk_size),
-            offset = int(raid_options.offset),
-            rotation = raid_options.rotation,
-            algorithm = raid_options.algorithm,
-        )
+        self.cwd = os.path.abspath(os.getcwd())
+        self.volumes = raid_volumes
+        self.options = raid_options
         #self.size = self.raid_dev.size()
+
+    def fsinit(self):
+        os.chdir(self.cwd)
+        self.raid_dev = pyraid.RaidDevice(
+            volumes = self.volumes,
+            level = int(self.options.level),
+            stripe_size = int(self.options.stripe_size),
+            disk_size = int(self.options.disk_size),
+            offset = int(self.options.offset),
+            rotation = self.options.rotation,
+            algorithm = self.options.algorithm,
+        )
+
     def getattr(self, path):
         st = BlankStat()
         if path == '/':
@@ -86,7 +93,7 @@ def main():
     options, args = parser.parse_args() 
 
     import sys
-    sys.argv = [sys.argv[0], options.mount_point, '-f'] # hack to set command line arguments to those that python-fuse will correctly parse
+    sys.argv = [sys.argv[0], options.mount_point] #, '-f'] # hack to set command line arguments to those that python-fuse will correctly parse
     
     server = RaidFS(options, args, version="%prog " + fuse.__version__, dash_s_do='setsingle')
     server.parse(errex=1)
